@@ -1,3 +1,4 @@
+import argparse
 import random
 
 
@@ -22,11 +23,19 @@ class Die(object):
 
 
 class Game(object):
-    def __init__(self):
+    def __init__(self, args):
         self.die = Die()
-        self.player1 = Player(raw_input('Please enter your name: '))
-        self.player2 = Player(raw_input('Please enter your name: '))
+        if args['player1'] == 'Human':
+            self.player1 = Human(raw_input('Please enter your name: '))
+        else:
+            self.player1 = Computer('Johnny 5')
+        if args['player2'] == 'Human':
+            self.player2 = Human(raw_input('Please enter your name: '))
+        else:
+            self.player2 = Computer('T-1000')
+        # set current player
         self.current_player = self.player1
+
 
     def next_turn(self):
         print('{} score is: {}'.format(self.current_player.name, self.current_player.score))
@@ -66,8 +75,15 @@ class Game(object):
             self.current_player = self.player1
 
 if __name__ == '__main__':
+    # setting up argparse
+    parser = argparse.ArgumentParser(description='pig game')
+    parser.add_argument('--player1', type=str, help='Player Type', required=True, choices={'Human','Computer'})
+    parser.add_argument('--player2', type=str, help='Player Type', required=True, choices={'Human','Computer'})
+    args = vars(parser.parse_args())
+
+
     # create game
-    pig = Game()
+    pig = Game(args)
     # run game
     while pig.player1.score < 100 and pig.player2.score < 100:
         pig.next_turn()
@@ -76,3 +92,4 @@ if __name__ == '__main__':
     else:
         winner = pig.player2
     print('The winner is: {}'.format(winner.name))
+
