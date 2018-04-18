@@ -44,7 +44,38 @@ class Human(Player):
 
 
 class Computer(Player):
-    pass
+    def next_turn(self):
+        print('{} score is: {}'.format(self.name, self.score))
+        # current player must choose roll or hold
+        choice = 'r'
+
+        while choice == 'r':
+            # current player rolls
+            # display current roll total and total players
+            die_roll = Die().roll()
+            print('You rolled {}'.format(die_roll))
+
+            # roll anything other than 1, add to tally
+            if die_roll != 1:
+                self.tally += die_roll
+                print('Your roll tally is: {}'.format(self.tally))
+                # roll another turn
+                # if computer tally is lesser of 25 or 100-score, then hold
+                hold = 100 - self.score
+                if 25 < 100 - self.score:
+                    hold = 25
+
+                if self.tally >= hold:
+                    choice = 'h'
+            else:
+                self.tally = 0
+                choice = 'not r'
+
+        # current player holds
+        # display current roll total and total players
+        self.score += self.tally
+        self.tally = 0
+        print('{} score is: {}'.format(self.name, self.score))
 
 
 class Die(object):
@@ -66,7 +97,6 @@ class Game(object):
         # set current player
         self.current_player = self.player1
 
-
     def next_turn(self):
         self.current_player.next_turn()
         # shifting the baton
@@ -75,13 +105,13 @@ class Game(object):
         else:
             self.current_player = self.player1
 
+
 if __name__ == '__main__':
     # setting up argparse
     parser = argparse.ArgumentParser(description='pig game')
-    parser.add_argument('--player1', type=str, help='Player Type', required=True, choices={'Human','Computer'})
-    parser.add_argument('--player2', type=str, help='Player Type', required=True, choices={'Human','Computer'})
+    parser.add_argument('--player1', type=str, help='Player Type', required=True, choices={'Human', 'Computer'})
+    parser.add_argument('--player2', type=str, help='Player Type', required=True, choices={'Human', 'Computer'})
     args = vars(parser.parse_args())
-
 
     # create game
     pig = Game(args)
@@ -93,4 +123,3 @@ if __name__ == '__main__':
     else:
         winner = pig.player2
     print('The winner is: {}'.format(winner.name))
-
