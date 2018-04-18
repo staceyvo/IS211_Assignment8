@@ -10,7 +10,37 @@ class Player(object):
 
 
 class Human(Player):
-    pass
+    def next_turn(self):
+        print('{} score is: {}'.format(self.name, self.score))
+        # current player must choose roll or hold
+        choice = 'pig'
+        # check if correct input given
+        while choice not in ['r', 'h']:
+            choice = raw_input('{} enter r or h to continue: '.format(self.name))
+
+        while choice == 'r':
+            # current player rolls
+            # display current roll total and total players
+            die_roll = Die().roll()
+            print('You rolled {}'.format(die_roll))
+
+            # roll anything other than 1, add to tally
+            if die_roll != 1:
+                self.tally += die_roll
+                print('Your roll tally is: {}'.format(self.tally))
+                # roll another turn
+                choice = 'anything'
+                while choice not in ['r', 'h']:
+                    choice = raw_input('{} enter r or h to continue: '.format(self.name))
+            else:
+                self.tally = 0
+                choice = 'not r'
+
+        # current player holds
+        # display current roll total and total players
+        self.score += self.tally
+        self.tally = 0
+        print('{} score is: {}'.format(self.name, self.score))
 
 
 class Computer(Player):
@@ -38,36 +68,7 @@ class Game(object):
 
 
     def next_turn(self):
-        print('{} score is: {}'.format(self.current_player.name, self.current_player.score))
-        # current player must choose roll or hold
-        choice = 'pig'
-        # check if correct input given
-        while choice not in ['r', 'h']:
-            choice = raw_input('{} enter r or h to continue: '.format(self.current_player.name))
-
-        while choice == 'r':
-            # current player rolls
-            # display current roll total and total players
-            die_roll = self.die.roll()
-            print('You rolled {}'.format(die_roll))
-
-            # roll anything other than 1, add to tally
-            if die_roll != 1:
-                self.current_player.tally += die_roll
-                print('Your roll tally is: {}'.format(self.current_player.tally))
-                # roll another turn
-                choice = 'anything'
-                while choice not in ['r', 'h']:
-                    choice = raw_input('{} enter r or h to continue: '.format(self.current_player.name))
-            else:
-                self.current_player.tally = 0
-                choice = 'not r'
-
-        # current player holds
-        # display current roll total and total players
-        self.current_player.score += self.current_player.tally
-        self.current_player.tally = 0
-        print('{} score is: {}'.format(self.current_player.name, self.current_player.score))
+        self.current_player.next_turn()
         # shifting the baton
         if self.current_player == self.player1:
             self.current_player = self.player2
