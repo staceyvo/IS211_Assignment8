@@ -1,5 +1,10 @@
 import argparse
+from datetime import datetime, timedelta
 import random
+
+
+# input factory
+# timed version
 
 
 class Player(object):
@@ -9,8 +14,21 @@ class Player(object):
         self.tally = 0
 
 
+    def next_turn(self, start_time, max_time):
+        self.my_turn()
+        elapsed_time = datetime.now() - start_time
+        if elapsed_time >= max_time:
+            self.tally = 0
+
+        # current player holds
+        # display current roll total and total players
+        self.score += self.tally
+        self.tally = 0
+        print('{} score is: {}'.format(self.name, self.score))
+
+
 class Human(Player):
-    def next_turn(self):
+    def my_turn(self):
         print('{} score is: {}'.format(self.name, self.score))
         # current player must choose roll or hold
         choice = 'pig'
@@ -36,15 +54,9 @@ class Human(Player):
                 self.tally = 0
                 choice = 'not r'
 
-        # current player holds
-        # display current roll total and total players
-        self.score += self.tally
-        self.tally = 0
-        print('{} score is: {}'.format(self.name, self.score))
-
 
 class Computer(Player):
-    def next_turn(self):
+    def my_turn(self):
         print('{} score is: {}'.format(self.name, self.score))
         # current player must choose roll or hold
         choice = 'r'
@@ -71,12 +83,6 @@ class Computer(Player):
                 self.tally = 0
                 choice = 'not r'
 
-        # current player holds
-        # display current roll total and total players
-        self.score += self.tally
-        self.tally = 0
-        print('{} score is: {}'.format(self.name, self.score))
-
 
 class Die(object):
     def roll(self):
@@ -86,6 +92,7 @@ class Die(object):
 class Game(object):
     def __init__(self, args):
         self.die = Die()
+
         if args['player1'] == 'Human':
             self.player1 = Human(raw_input('Please enter your name: '))
         else:
@@ -94,16 +101,25 @@ class Game(object):
             self.player2 = Human(raw_input('Please enter your name: '))
         else:
             self.player2 = Computer('T-1000')
+
+
         # set current player
         self.current_player = self.player1
 
+        # game timer
+        self.start_time = datetime.now()
+        self.max_time = timedelta(0, 60)
+        self.elapsed_time = timedelta()
+
     def next_turn(self):
-        self.current_player.next_turn()
+        self.current_player.next_turn(self.start_time, self.max_time)
         # shifting the baton
         if self.current_player == self.player1:
             self.current_player = self.player2
         else:
             self.current_player = self.player1
+
+        self.elapsed_time = datetime.now() - self.start_time
 
 
 if __name__ == '__main__':
@@ -116,10 +132,20 @@ if __name__ == '__main__':
     # create game
     pig = Game(args)
     # run game
-    while pig.player1.score < 100 and pig.player2.score < 100:
+    # while pig.player1.score < 100 and pig.player2.score < 100:
+    #     pig.next_turn()
+    # if pig.player1.score > 99:
+    #     winner = pig.player1
+
+
+
+    while pig.player1.score < 100 and pig.player2.score < 100 and pig.elapsed_time <= pig.max_time:
         pig.next_turn()
-    if pig.player1.score > 99:
+    if pig.player1.score > pig.player2.score:
         winner = pig.player1
-    else:
+        print('The winner is: {}'.format(winner.name))
+    elif pig.player1.score < pig.player2.score:
         winner = pig.player2
-    print('The winner is: {}'.format(winner.name))
+        print('The winner is: {}'.format(winner.name))
+    else:
+        print('Game Over, time limit reached: Tie-Score! {}'.format(pig.player1.score))
