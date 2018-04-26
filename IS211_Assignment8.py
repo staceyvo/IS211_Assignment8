@@ -4,7 +4,6 @@ import random
 
 
 # input factory
-# timed version
 
 
 class Player(object):
@@ -88,19 +87,31 @@ class Die(object):
     def roll(self):
         return random.randint(1, 6)
 
+class Player_Factory(object):
+    def __init__(self):
+        self.comp_names = ['Johnny 5', 'T-1000', 'R2D2', 'Dalek', 'Kit', 'Optimus Prime']
+        self.last_comp_name = None
+
+
+
+    def create_player(self, player_type):
+        if player_type == 'Human':
+            return Human(raw_input('Please enter your name: '))
+        else:
+            comp_player = random.choice(self.comp_names)
+            while comp_player == self.last_comp_name:
+                comp_player = random.choice(self.comp_names)
+            self.last_comp_name = comp_player
+            return Computer(comp_player)
+
+
 
 class Game(object):
     def __init__(self, args):
         self.die = Die()
-
-        if args['player1'] == 'Human':
-            self.player1 = Human(raw_input('Please enter your name: '))
-        else:
-            self.player1 = Computer('Johnny 5')
-        if args['player2'] == 'Human':
-            self.player2 = Human(raw_input('Please enter your name: '))
-        else:
-            self.player2 = Computer('T-1000')
+        player_creator = Player_Factory()
+        self.player1 = player_creator.create_player(args['player1'])
+        self.player2 = player_creator.create_player(args['player2'])
 
 
         # set current player
@@ -131,14 +142,9 @@ if __name__ == '__main__':
 
     # create game
     pig = Game(args)
+
+
     # run game
-    # while pig.player1.score < 100 and pig.player2.score < 100:
-    #     pig.next_turn()
-    # if pig.player1.score > 99:
-    #     winner = pig.player1
-
-
-
     while pig.player1.score < 100 and pig.player2.score < 100 and pig.elapsed_time <= pig.max_time:
         pig.next_turn()
     if pig.player1.score > pig.player2.score:
