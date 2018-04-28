@@ -3,9 +3,6 @@ from datetime import datetime, timedelta
 import random
 
 
-# input factory
-
-
 class Player(object):
     def __init__(self, name):
         self.name = name
